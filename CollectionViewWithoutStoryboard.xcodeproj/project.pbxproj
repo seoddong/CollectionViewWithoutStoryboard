@@ -8,20 +8,24 @@
 
 /* Begin PBXBuildFile section */
 		748241611D07CB9C00C319DE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 748241601D07CB9C00C319DE /* AppDelegate.swift */; };
-		748241631D07CB9C00C319DE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 748241621D07CB9C00C319DE /* ViewController.swift */; };
 		748241661D07CB9C00C319DE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 748241641D07CB9C00C319DE /* Main.storyboard */; };
 		748241681D07CB9C00C319DE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 748241671D07CB9C00C319DE /* Assets.xcassets */; };
 		7482416B1D07CB9C00C319DE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 748241691D07CB9C00C319DE /* LaunchScreen.storyboard */; };
+		748241771D07D12A00C319DE /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 748241761D07D12A00C319DE /* MainViewController.swift */; };
+		748241791D08496800C319DE /* MainCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 748241781D08496800C319DE /* MainCollectionViewCell.swift */; };
+		7482417B1D08641400C319DE /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7482417A1D08641400C319DE /* UIImage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		7482415D1D07CB9C00C319DE /* CollectionViewWithoutStoryboard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CollectionViewWithoutStoryboard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		748241601D07CB9C00C319DE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		748241621D07CB9C00C319DE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		748241651D07CB9C00C319DE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		748241671D07CB9C00C319DE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7482416A1D07CB9C00C319DE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7482416C1D07CB9C00C319DE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		748241761D07D12A00C319DE /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		748241781D08496800C319DE /* MainCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainCollectionViewCell.swift; sourceTree = "<group>"; };
+		7482417A1D08641400C319DE /* UIImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,11 +59,13 @@
 			isa = PBXGroup;
 			children = (
 				748241601D07CB9C00C319DE /* AppDelegate.swift */,
-				748241621D07CB9C00C319DE /* ViewController.swift */,
 				748241641D07CB9C00C319DE /* Main.storyboard */,
 				748241671D07CB9C00C319DE /* Assets.xcassets */,
 				748241691D07CB9C00C319DE /* LaunchScreen.storyboard */,
 				7482416C1D07CB9C00C319DE /* Info.plist */,
+				748241761D07D12A00C319DE /* MainViewController.swift */,
+				748241781D08496800C319DE /* MainCollectionViewCell.swift */,
+				7482417A1D08641400C319DE /* UIImage.swift */,
 			);
 			path = CollectionViewWithoutStoryboard;
 			sourceTree = "<group>";
@@ -135,8 +141,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				748241631D07CB9C00C319DE /* ViewController.swift in Sources */,
 				748241611D07CB9C00C319DE /* AppDelegate.swift in Sources */,
+				7482417B1D08641400C319DE /* UIImage.swift in Sources */,
+				748241791D08496800C319DE /* MainCollectionViewCell.swift in Sources */,
+				748241771D07D12A00C319DE /* MainViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,6 +296,7 @@
 				748241711D07CB9C00C319DE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
