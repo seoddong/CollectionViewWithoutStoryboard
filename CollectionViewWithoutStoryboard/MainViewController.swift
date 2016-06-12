@@ -15,14 +15,12 @@ class MainViewController: UIViewController {
     var collectionView: UICollectionView!
     
     // 2. Set up CollectionView and its layout
-    let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+    let layout = UICollectionViewFlowLayout()
     
     // 화면 로테이션 시 제대로 화면을 뿌려주기 위한 변수
-    var currentOffset: CGPoint!
     var currentIndex: Int = 0
-    var indexPathRow: Int = 0
-    
-    let barSize: CGFloat = 0.0 //44.0
+    var cellSize: CGSize?
+
     var dataArray: [String] = []
     let reuseCellIdentifier = "reuseCellIdentifier"
     let reuseHeaderIdentifier = "reuseHeaderIdentifier"
@@ -41,7 +39,7 @@ class MainViewController: UIViewController {
         layout.minimumInteritemSpacing = 0.0
         layout.minimumLineSpacing = 0.0
         
-        print("self.view.frame=\(self.view.frame)")
+
         collectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -53,6 +51,8 @@ class MainViewController: UIViewController {
         self.view.addSubview(collectionView)
         
         loadImages()
+        
+        cellSize = collectionView.frame.size
         
         self.automaticallyAdjustsScrollViewInsets = false
     }
@@ -69,7 +69,7 @@ class MainViewController: UIViewController {
         for ii in 1...20 {
             self.dataArray.append(String(format: "%003d", ii))
         }
-        print("dataArray=\(dataArray)")
+        debugPrint("dataArray=\(dataArray)")
 
         
         
@@ -77,46 +77,41 @@ class MainViewController: UIViewController {
     
     // Detect device's rotation 1
     override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        // Where is the best location of super? Top of this method or bottom?
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
         
-        // size는 New Size이며 old size는 self.view.bounds.size로 확인 가능하다.
-        print("4 self.collectionView.frame=\(self.collectionView.frame)")
-        print("4 size=\(size)")
+        // size는 New Size이며 old size는 self.view.bounds.size, self.collectionView.frame로 확인 가능하다.
         
-        if UIDevice.currentDevice().orientation.isLandscape.boolValue {
-            //bool 값이 ture 면 가로
-            
-        } else {
-            //bool 값이 false 면 세로
-            
-        }
+        //let width = layout.sectionInset.left + layout.sectionInset.right + layout.content
+        cellSize = size
         
-//        let barSize = self.collectionView.frame.origin.y
-//        let newSize = CGSize(width: size.width, height: size.height - barSize)
+        let oldBounds = self.collectionView.bounds
+        debugPrint("4 oldBounds=\(oldBounds)")
+//        debugPrint("4 size=\(size)")
+        let index = round(oldBounds.origin.y / oldBounds.height)
         
-        
-        self.collectionView.frame.size = size
-        
-        let currentSize = self.collectionView.bounds.size
-        let offset = CGFloat(self.indexPathRow) * size.height
-        print("offset=\(offset)")
+        // rotation 후 보던 셀이 보이게 위치를 정확히 세팅해준다.
+        currentIndex = Int(index)
+        let offset = CGFloat(currentIndex) * size.height
+        debugPrint("offset=\(currentIndex) * \(size.height) = \(offset)")
         self.collectionView.setContentOffset(CGPointMake(0, offset), animated: true)
-        print("self.collectionView.contentOffset=\(self.collectionView.contentOffset)")
+//        debugPrint("self.collectionView.contentOffset=\(self.collectionView.contentOffset)")
         
         // Suppress the layout errors by invalidating the layout
         self.collectionView.collectionViewLayout.invalidateLayout();
         
+        // 위에서 invalidateLayout로 layout을 업데이트했음에도 불구하고 아래 로그는 이전 사이즈가 출력된다. 그래서 "이상하지만" 강제로 self.collectionView.frame.size = size를 해 주었다.
+        // 또 하나 재미있는 것은 self.collectionView.frame.size = size를 위 invalidateLayout 위에 위치시키면 warning이 발생한다.
+        // debugPrint("self.collectionView.frame=\(self.collectionView.frame), self.collectionView.bounds=\(self.collectionView.bounds)")
+        self.collectionView.frame.size = size
         
-        // Where is the best location of super? Top of this method or bottom?
-        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
-    }
 
-    // Detect device's rotation 2
-    override func viewWillLayoutSubviews() {
-        //        let frame = self.view.frame
-        //        self.collectionView.frame = CGRectMake(frame.origin.x, frame.origin.y + barSize, frame.size.width, frame.size.height - barSize)
-        print("self.collectionView.frame=\(self.collectionView.frame)")
-        super.viewWillLayoutSubviews()
-        self.collectionView.collectionViewLayout.invalidateLayout();
+    }
+    
+    func adjustInterfaceForSize(size: CGSize) {
+        if size.width > size.height {
+            
+        }
     }
 
     /*
@@ -144,16 +139,33 @@ extension MainViewController: UICollectionViewDataSource {
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
-        print("indexPath=\(indexPath.row)")
+        // 이 메소드는 cell을 표현하기 위한 메소드이다. 그러므로 다른 용도로 사용하게 되면 원하는 결과를 얻지 못 할 수 있으므로 그런 용도로 사용하지 않는 것이 좋다.
+        // 예컨대 디바이스의 상황에 따라서 이 메소드가 한 번에 여러 번 호출될 수 있기 때문에 cell 표현 이외의 용도로 사용하게 되면 엉뚱한 값을 갖게 된다. 다시 말해서 이 메소드가 마지막으로 호출된 결과와 내가 현재 디바이스에서 보고 있는 화면의 결과가 다를 수 있다는 것이다.
+        
+
+//        debugPrint("self.collectionView.bounds=\(self.collectionView.bounds)")
+//        debugPrint("self.collectionView.frame=\(self.collectionView.frame)")
+        
+        //print("indexPath=\(indexPath.row)")
+        let frame = self.collectionView.frame
 
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseCellIdentifier, forIndexPath: indexPath) as! MainCollectionViewCell
 
         let imageName = dataArray[indexPath.row]
         let image = UIImage(named: imageName)
         cell.imageView.image = image
-        cell.imageView.frame = self.collectionView.frame
-        print("cell.imageView.frame=\(cell.imageView.frame)")
-        print("cell.imageView.image=\(cell.imageView.image!.size)")
+        if (frame.size.width >= frame.size.height) {
+            // 가로모드
+            cell.imageView.frame = frame
+        }
+        else {
+            // 세로모드: 이미지가 너무 작게 나오니 프레임을 키워준다.
+            cell.imageView.frame = CGRectMake(0, 0, frame.width*2, frame.height)
+        }
+//        debugPrint("cell.imageView.frame=\(frame)")
+//        debugPrint("cell.imageView.image=\(cell.imageView.image!.size)")
+        
+        
         if (indexPath.row % 2 == 0) {
             cell.backgroundColor = UIColor.orangeColor()
         }
@@ -161,15 +173,10 @@ extension MainViewController: UICollectionViewDataSource {
             cell.backgroundColor = UIColor.yellowColor()
         }
         
-        currentOffset = self.collectionView.contentOffset
-        print("currentOffset=\(currentOffset)")
-        // 스크롤 방향에 따라 x,y를 변경해야 한다.
-        currentIndex = Int(currentOffset.y / self.collectionView.frame.size.height)
-        print("currentIndex=\(currentIndex)")
-        indexPathRow = indexPath.row
-
         return cell
     }
+    
+
     
 //    func collectionView(collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, atIndexPath indexPath: NSIndexPath) -> UICollectionReusableView {
 //        var reusableView : UICollectionReusableView? = nil
@@ -183,18 +190,45 @@ extension MainViewController: UICollectionViewDataSource {
 //        }
 //        return reusableView!
 //    }
+    
+    
+    // 아래 4개 메소드는 셀 표현 시 애니메이션 효과를 주기 위한 메소드이다.
+    func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
+        animateCell(cell)
+    }
+    func animateCell(cell: UICollectionViewCell) {
+        let animation = CABasicAnimation(keyPath: "cornerRadius")
+        animation.fromValue = 200
+        cell.layer.cornerRadius = 0
+        animation.toValue = 0
+        animation.duration = 1
+        cell.layer.addAnimation(animation, forKey: animation.keyPath)
+    }
+    func animateCellAtIndexPath(indexPath: NSIndexPath) {
+        guard let cell = collectionView.cellForItemAtIndexPath(indexPath) else { return }
+        animateCell(cell)
+    }
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        animateCellAtIndexPath(indexPath)
+    }
+    
+    
+    
 }
+
+
 
 // MARK:UICollectionViewDelegateFlowLayout
 extension MainViewController : UICollectionViewDelegateFlowLayout {
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-//        print("cell: self.collectionView.frame.size=\(self.collectionView.frame.size)")
         
-        return self.collectionView.frame.size
+        return cellSize!
     }
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
-        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        return UIEdgeInsetsZero //UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
 }
+
+

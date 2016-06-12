@@ -19,7 +19,7 @@ class MainCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
 
 
-        print("cell.init(frame)=\(frame)")
+        debugPrint("cell.init(frame)=\(frame)")
         imageView = UIImageView(frame: frame)
         
         imageView.contentMode = .ScaleAspectFit
