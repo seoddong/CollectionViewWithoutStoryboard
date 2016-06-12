@@ -58,7 +58,7 @@ class MainViewController: UIViewController {
         loadImages()
         
         cellSize = getCellSize() //collectionView.frame.size
-        
+
         self.automaticallyAdjustsScrollViewInsets = false
     }
 
@@ -160,8 +160,8 @@ extension MainViewController: UICollectionViewDataSource {
         // 예컨대 디바이스의 상황에 따라서 이 메소드가 한 번에 여러 번 호출될 수 있기 때문에 cell 표현 이외의 용도로 사용하게 되면 엉뚱한 값을 갖게 된다. 다시 말해서 이 메소드가 마지막으로 호출된 결과와 내가 현재 디바이스에서 보고 있는 화면의 결과가 다를 수 있다는 것이다.
         
 
-        debugPrint("5 self.collectionView.bounds=\(self.collectionView.bounds)")
-        debugPrint("5 self.collectionView.frame=\(self.collectionView.frame)")
+//        debugPrint("5 self.collectionView.bounds=\(self.collectionView.bounds)")
+//        debugPrint("5 self.collectionView.frame=\(self.collectionView.frame)")
         
         //print("indexPath=\(indexPath.row)")
         let frame = self.collectionView.frame
@@ -171,16 +171,10 @@ extension MainViewController: UICollectionViewDataSource {
         let imageName = dataArray[indexPath.row]
         let image = UIImage(named: imageName)
         cell.imageView.image = image
-        if (frame.size.width >= frame.size.height) {
-            // 가로모드
-            cell.imageView.frame = frame
-        }
-        else {
-            // 세로모드: 이미지가 너무 작게 나오니 프레임을 키워준다.
-            cell.imageView.frame = CGRectMake(0, 0, frame.width*2, frame.height)
-        }
-        debugPrint("5 cell.imageView.bounds=\(cell.imageView.bounds)")
-        debugPrint("5 cell.imageView.frame=\(cell.imageView.frame)")
+
+        cell.updateCellFrame(frame)
+//        debugPrint("5 cell.imageView.bounds=\(cell.imageView.bounds)")
+//        debugPrint("5 cell.imageView.frame=\(cell.imageView.frame)")
 
         
         
