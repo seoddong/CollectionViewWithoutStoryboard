@@ -28,10 +28,13 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        
+        // collectionView.contentInset: 말 그대로 collectionView의 내부 공간이다. 그러므로 이 값이 가장 바깥 공간이 될 것이다. 문제는 이 놈을 설정할 경우 collectionView.pagingEnabled에 영향을 준다. collectionView.pagingEnabled는 collectionView의 bounds를 계산하여 paging처리를 하는데 contentInset이 bounds를 변경하기 때문이다. 이 놈은 사용하면 안 되는 놈으로 생각된다.
+        // layout.sectionInset: 말 그대로 섹션에 대한 내부 공간이다. 섹션이 하나인 경우는 제일 위와 제일 아래에 설정된 공간을 확보한다.
+        // layout.minimumInteritemSpacing: 여러가지 값으로 테스트를 해 보았지만 스크린에 한 셀만 보여지는 케이스에는 값을 아무리 크게 줘도 아무 효과가 없는 것 같다.
+        // layout.minimumLineSpacing: 셀 사이에 공간을 부여한다.
         
         // If the delegate object does not implement the collectionView:layout:insetForSectionAtIndex: method, the flow layout uses the value in this property to set the margins for each section.
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        layout.sectionInset = UIEdgeInsetsZero //UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
         
         // If the delegate does not implement the collectionView:layout:sizeForItemAtIndexPath: method, the flow layout uses the value in this property to set the size of each cell.
         // layout.itemSize = CGSize(width: 90, height: 120)
@@ -46,23 +49,40 @@ class MainViewController: UIViewController {
         collectionView.registerClass(MainCollectionViewCell.self, forCellWithReuseIdentifier: reuseCellIdentifier)
 //        collectionView.registerClass(UICollectionReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: reuseHeaderIdentifier)  // UICollectionReusableView
         collectionView.pagingEnabled = true
-        collectionView.backgroundColor = UIColor.whiteColor()
+        
+        collectionView.contentInset = UIEdgeInsetsZero //UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
+        collectionView.backgroundColor = UIColor.greenColor()
         
         self.view.addSubview(collectionView)
         
         loadImages()
         
-        cellSize = collectionView.frame.size
+        cellSize = getCellSize() //collectionView.frame.size
         
         self.automaticallyAdjustsScrollViewInsets = false
     }
-
-    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    
+    
+    func getCellSize() -> CGSize {
+        var vSpacing: CGFloat = 0, hSpacing: CGFloat = 0
+        if layout.scrollDirection == .Vertical {
+            vSpacing = layout.minimumLineSpacing
+        }
+        else {
+            hSpacing = layout.minimumLineSpacing
+        }
+        let width = collectionView.frame.width - layout.sectionInset.left - layout.sectionInset.right - collectionView.contentInset.left - collectionView.contentInset.right - hSpacing
+        let height = collectionView.frame.height - layout.sectionInset.top - layout.sectionInset.bottom - collectionView.contentInset.top - collectionView.contentInset.bottom - vSpacing
+        //debugPrint("width=\(width), height=\(height)")
+        return CGSizeMake(width, height)
+    }
+    
     
     func loadImages() {
         
@@ -81,9 +101,6 @@ class MainViewController: UIViewController {
         super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
         
         // size는 New Size이며 old size는 self.view.bounds.size, self.collectionView.frame로 확인 가능하다.
-        
-        //let width = layout.sectionInset.left + layout.sectionInset.right + layout.content
-        cellSize = size
         
         let oldBounds = self.collectionView.bounds
         debugPrint("4 oldBounds=\(oldBounds)")
@@ -104,7 +121,7 @@ class MainViewController: UIViewController {
         // 또 하나 재미있는 것은 self.collectionView.frame.size = size를 위 invalidateLayout 위에 위치시키면 warning이 발생한다.
         // debugPrint("self.collectionView.frame=\(self.collectionView.frame), self.collectionView.bounds=\(self.collectionView.bounds)")
         self.collectionView.frame.size = size
-        
+        cellSize = getCellSize()
 
     }
     
@@ -143,8 +160,8 @@ extension MainViewController: UICollectionViewDataSource {
         // 예컨대 디바이스의 상황에 따라서 이 메소드가 한 번에 여러 번 호출될 수 있기 때문에 cell 표현 이외의 용도로 사용하게 되면 엉뚱한 값을 갖게 된다. 다시 말해서 이 메소드가 마지막으로 호출된 결과와 내가 현재 디바이스에서 보고 있는 화면의 결과가 다를 수 있다는 것이다.
         
 
-//        debugPrint("self.collectionView.bounds=\(self.collectionView.bounds)")
-//        debugPrint("self.collectionView.frame=\(self.collectionView.frame)")
+        debugPrint("5 self.collectionView.bounds=\(self.collectionView.bounds)")
+        debugPrint("5 self.collectionView.frame=\(self.collectionView.frame)")
         
         //print("indexPath=\(indexPath.row)")
         let frame = self.collectionView.frame
@@ -162,8 +179,9 @@ extension MainViewController: UICollectionViewDataSource {
             // 세로모드: 이미지가 너무 작게 나오니 프레임을 키워준다.
             cell.imageView.frame = CGRectMake(0, 0, frame.width*2, frame.height)
         }
-//        debugPrint("cell.imageView.frame=\(frame)")
-//        debugPrint("cell.imageView.image=\(cell.imageView.image!.size)")
+        debugPrint("5 cell.imageView.bounds=\(cell.imageView.bounds)")
+        debugPrint("5 cell.imageView.frame=\(cell.imageView.frame)")
+
         
         
         if (indexPath.row % 2 == 0) {
@@ -226,9 +244,9 @@ extension MainViewController : UICollectionViewDelegateFlowLayout {
         return cellSize!
     }
     
-    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
-        return UIEdgeInsetsZero //UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-    }
+//    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAtIndex section: Int) -> UIEdgeInsets {
+//        return UIEdgeInsetsZero //UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+//    }
 }
 
 
