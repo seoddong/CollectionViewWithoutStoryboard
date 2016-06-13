@@ -30,8 +30,8 @@ class MainViewController: UIViewController {
 
         // collectionView.contentInset: 말 그대로 collectionView의 내부 공간이다. 그러므로 이 값이 가장 바깥 공간이 될 것이다. 문제는 이 놈을 설정할 경우 collectionView.pagingEnabled에 영향을 준다. collectionView.pagingEnabled는 collectionView의 bounds를 계산하여 paging처리를 하는데 contentInset이 bounds를 변경하기 때문이다. 이 놈은 사용하면 안 되는 놈으로 생각된다.
         // layout.sectionInset: 말 그대로 섹션에 대한 내부 공간이다. 섹션이 하나인 경우는 제일 위와 제일 아래에 설정된 공간을 확보한다.
-        // layout.minimumInteritemSpacing: 여러가지 값으로 테스트를 해 보았지만 스크린에 한 셀만 보여지는 케이스에는 값을 아무리 크게 줘도 아무 효과가 없는 것 같다.
-        // layout.minimumLineSpacing: 셀 사이에 공간을 부여한다.
+        // layout.minimumInteritemSpacing: 셀 간의 간격이기 때문에 이 예제에서는 효과가 없다. 만약 셀 스크롤 방향이 가로라면 이걸 써야 할 것.
+        // layout.minimumLineSpacing: 행 사이에 공간을 부여한다. 이 예제에서는 결국 셀 사이에 공간을 부여한다. 만약 셀 스크롤 방향이 세로라면 효과가 없을 것이다.
         
         // If the delegate object does not implement the collectionView:layout:insetForSectionAtIndex: method, the flow layout uses the value in this property to set the margins for each section.
         layout.sectionInset = UIEdgeInsetsZero //UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
@@ -44,11 +44,15 @@ class MainViewController: UIViewController {
         
 
         collectionView = UICollectionView(frame: self.view.frame, collectionViewLayout: layout)
+        
         collectionView.dataSource = self
         collectionView.delegate = self
         collectionView.registerClass(MainCollectionViewCell.self, forCellWithReuseIdentifier: reuseCellIdentifier)
 //        collectionView.registerClass(UICollectionReusableView.self, forSupplementaryViewOfKind: UICollectionElementKindSectionHeader, withReuseIdentifier: reuseHeaderIdentifier)  // UICollectionReusableView
         collectionView.pagingEnabled = true
+        
+        // 코드로 뷰, constraints를 추가하는 경우에는 아래와 같이 자동 리사이징을 꺼야 한다고 한다.
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         collectionView.contentInset = UIEdgeInsetsZero //UIEdgeInsets(top: 5, left: 5, bottom: 5, right: 5)
         collectionView.backgroundColor = UIColor.greenColor()

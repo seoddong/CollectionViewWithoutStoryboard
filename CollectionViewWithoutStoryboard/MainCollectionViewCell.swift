@@ -10,27 +10,46 @@ import UIKit
 
 class MainCollectionViewCell: UICollectionViewCell {
     
+    var scrollView: UIScrollView!
     var imageView: UIImageView!
-    var label: UILabel!
+    var storyLabel: UILabel!
     
-    // 아래 init(frame)이 이상하게 두 번 호출된다. 왜 그런지 알 수 없다. 두 번째 호출되었을 때 frame 정보가 좀 맞지 않아서 두 번째 호출을 무시하기 위한 플래그를 설정한다. 허나 아래의 코드는 소용이 없다. 왜냐하면 이 인스턴스 자체가 두 개 생기기 때문이다.
-    // 또한 파라미터로 넘어오는 frame도 쓸만한 것이 아니다. 다른 용도의 frame인 것 같다.
+    // 아래 init(frame)이 이상하게 두어 번 호출된다. 이유는 재사용할 셀을 준비하면서 알아서 몇 개의 셀 인스턴스를 (마치 pool처럼)만들어놓고 돌아가며 재사용하는 것 같다.
     override init(frame: CGRect) {
         super.init(frame: frame)
 
         debugPrint("cell.init(frame)=\(frame)")
+        
+        scrollView = UIScrollView()
+        
+        scrollView.backgroundColor = UIColor.blueColor()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.delegate = self
 
         imageView = UIImageView()
         
         imageView.contentMode = .ScaleAspectFit
-        imageView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        //imageView.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        imageView.translatesAutoresizingMaskIntoConstraints = false
         
-        label = UILabel()
-        label.text = "AVENGERS: Age of Ultron"
-        label.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        storyLabel = UILabel()
+        storyLabel.text = "AVENGERS: Age of Ultron"
+        storyLabel.backgroundColor = UIColor.lightGrayColor()
+        //label.autoresizingMask = [.FlexibleWidth, .FlexibleHeight]
+        storyLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        self.contentView.addSubview(imageView)
-        self.contentView.addSubview(label)
+        self.contentView.addSubview(scrollView)
+        self.contentView.addSubview(storyLabel)
+        scrollView.addSubview(imageView)
+        
+        
+        let viewDictionary = ["scrollView": scrollView, "storyLabel": storyLabel, "imageView": imageView]
+        
+        self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|-[scrollView]-|", options: .AlignAllBaseline, metrics: nil, views: viewDictionary))
+        self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-[scrollView]-[storyLabel]-|", options: .AlignAllCenterX, metrics: nil, views: viewDictionary))
+        scrollView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[imageView]|", options: .AlignAllBaseline, metrics: nil, views: viewDictionary))
+        scrollView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[imageView]|", options: .AlignAllCenterX, metrics: nil, views: viewDictionary))
+        debugPrint("cell.imageView.frame=\(imageView.frame)")
     }
     
     func updateCellFrame(frame: CGRect) {
@@ -44,12 +63,16 @@ class MainCollectionViewCell: UICollectionViewCell {
         let labelFrame = CGRectMake(frame.origin.x, frame.origin.y + imageViewHeight, frame.width, labelHeight)
         if (frame.size.width >= frame.size.height) {
             imageViewFrame = CGRectMake(frame.origin.x, frame.origin.y, frame.width, imageViewHeight)
+            imageView.frame.size = imageViewFrame.size
         }
         else {
             imageViewFrame = CGRectMake(frame.origin.x, frame.origin.y, frame.width*2, imageViewHeight)
+            imageView.frame.size = imageViewFrame.size
         }
-        imageView.frame = imageViewFrame
-        label.frame = labelFrame
+        debugPrint("imageView.frame=\(imageView.frame)")
+        //scrollView.contentSize = scrollView.frame.size
+//        imageView.frame = imageViewFrame
+//        storyLabel.frame = labelFrame
 //        debugPrint("imageViewFrame=\(imageViewFrame)")
 //        debugPrint("labelFrame=\(labelFrame)")
     }
@@ -59,4 +82,12 @@ class MainCollectionViewCell: UICollectionViewCell {
     }
     
     
+}
+
+extension MainCollectionViewCell: UIScrollViewDelegate {
+    func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
+        debugPrint("viewForZoomingInScrollView: scrollView.contentSize=\(scrollView.contentSize)")
+        debugPrint("viewForZoomingInScrollView: imageView.frame=\(imageView.frame)")
+        return imageView
+    }
 }
