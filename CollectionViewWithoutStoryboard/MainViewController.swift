@@ -93,7 +93,7 @@ class MainViewController: UIViewController {
         for ii in 1...20 {
             self.dataArray.append(String(format: "%003d", ii))
         }
-        debugPrint("dataArray=\(dataArray)")
+        debugPrint("loadImages: dataArray=\(dataArray)")
 
         
         
@@ -107,14 +107,14 @@ class MainViewController: UIViewController {
         // size는 New Size이며 old size는 self.view.bounds.size, self.collectionView.frame로 확인 가능하다.
         
         let oldBounds = self.collectionView.bounds
-        debugPrint("4 oldBounds=\(oldBounds)")
+        debugPrint("viewWillTransitionToSize: oldBounds=\(oldBounds)")
 //        debugPrint("4 size=\(size)")
         let index = round(oldBounds.origin.y / oldBounds.height)
         
         // rotation 후 보던 셀이 보이게 위치를 정확히 세팅해준다.
         currentIndex = Int(index)
         let offset = CGFloat(currentIndex) * size.height
-        debugPrint("offset=\(currentIndex) * \(size.height) = \(offset)")
+        debugPrint("viewWillTransitionToSize: offset=\(currentIndex) * \(size.height) = \(offset)")
         self.collectionView.setContentOffset(CGPointMake(0, offset), animated: true)
 //        debugPrint("self.collectionView.contentOffset=\(self.collectionView.contentOffset)")
         
@@ -175,6 +175,7 @@ extension MainViewController: UICollectionViewDataSource {
         let imageName = dataArray[indexPath.row]
         let image = UIImage(named: imageName)
         cell.imageView.image = image
+        debugPrint("collectionView: image.size=\(image?.size)")
 
         cell.updateCellFrame(frame)
 //        debugPrint("5 cell.imageView.bounds=\(cell.imageView.bounds)")
