@@ -128,12 +128,7 @@ class MainViewController: UIViewController {
         cellSize = getCellSize()
 
     }
-    
-    func adjustInterfaceForSize(size: CGSize) {
-        if size.width > size.height {
-            
-        }
-    }
+
 
     /*
     // MARK: - Navigation
